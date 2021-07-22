@@ -20,11 +20,8 @@
 *.iml
 *.ipr
 
-
-
 .vscode
 .java-version
-
 
 
 output/

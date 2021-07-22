@@ -54,6 +54,7 @@ public class Schema {
   public static class ParseResultToString 
   extends SimpleFunction<Result, String> {
     @Override
+    
     public String apply(Result input) {
       byte[] family =Bytes.toBytes("LC") ;
       byte [] qualifier = Bytes.toBytes("AC");
@@ -63,42 +64,31 @@ public class Schema {
   }
   
   public static class ParseByteArrayToString
-  extends SimpleFunction<LoadCurveWithEnumValue, String> {
+  extends SimpleFunction<LoadCurveWithEnumValueBlueprint, String> {
     @Override
-    public String apply(LoadCurveWithEnumValue input) {
+    public String apply(LoadCurveWithEnumValueBlueprint input) {
       return input.toString();
     }
   }
   
-  
-  
   static class Decodify 
-  extends DoFn<Result, LoadCurveWithEnumValue> {
+  extends DoFn<Result, LoadCurveWithEnumValueBlueprint> {
     @ProcessElement
-    public void processElement(@Element Result element, OutputReceiver<LoadCurveWithEnumValue> receiver) throws CoderException {
+    public void processElement(@Element Result element, OutputReceiver<LoadCurveWithEnumValueBlueprint> receiver) throws CoderException {
       byte[] family =Bytes.toBytes("LC") ;
       byte [] qualifier = Bytes.toBytes("AC");
-      System.out.println("\n\n\n\n\n\nVALUE:" + Bytes.toString(element.getValue(family,qualifier)));
-      //LoadCurveWithEnumValue help3 =  CoderUtils.decodeFromByteArray(AvroCoder.of(LoadCurveWithEnumValueOld.class), element.getValue(family,qualifier));
-      LoadCurveWithEnumValue help =  CoderUtils.decodeFromByteArray(AvroCoder.of(LoadCurveWithEnumValue.class), element.getValue(family,qualifier));
-      //System.out.println("LoadCurveWithEnumValue:" + help.toString());
-      //help.equals(help2);
+      LoadCurveWithEnumValueRemoveClassTou help2 =  CoderUtils.decodeFromByteArray(AvroCoder.of(LoadCurveWithEnumValueRemoveClassTou.class), 
+      element.getValue(family,qualifier));
+      LoadCurveWithEnumValueBlueprint help =  CoderUtils.decodeFromByteArray(AvroCoder.of(LoadCurveWithEnumValueBlueprint.class), 
+      element.getValue(family,qualifier));
+      
+      System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n" + help2.equals(help));
+      System.out.println("\n\n\n" + help.toString());
+      System.out.println(help2.toString());
       receiver.output(help);
     }
   }
-  static class Encodify 
-  extends DoFn<LoadCurveWithEnumValue, byte[]> {
-    @ProcessElement
-    public void processElement(@Element LoadCurveWithEnumValue element, OutputReceiver<byte[]> receiver) throws CoderException {
-      
-      byte[] help = CoderUtils.encodeToByteArray(AvroCoder.of(LoadCurveWithEnumValue.class), element);
-      
-      //System.out.println("LoadCurveWithEnumValue:" + element.toString());
-      System.out.println( Bytes.toString(help) + "\n\n\n\n\n\n");
-      receiver.output( help );
-    }
-  }
-  
+
   /** Pipeline default */
   public interface SchemaOptions 
   extends PipelineOptions {
@@ -131,14 +121,8 @@ public class Schema {
     
     PCollection<Result> bigTableEntries = p.apply(Create.of(getResult));
     
-    PCollection<LoadCurveWithEnumValue> decodedEntries = bigTableEntries.apply("Decode", ParDo.of( new Decodify()));
-    
-    // Operations ....
-    //.apply("Operations ..." )
-    
-    PCollection<byte[]> encodedEntries =  decodedEntries.apply("Encode", ParDo.of( new Encodify()));
-    
-    
+    PCollection<LoadCurveWithEnumValueBlueprint> decodedEntries = bigTableEntries.apply("Decode", ParDo.of( new Decodify()));
+
     // print results from table:
     //bigTableEntries.apply("ParseToString" , MapElements.via(new ParseResultToString()))
     //decodedEntries.apply("ParseToString" , MapElements.via(new ParseByteArrayToString()))
@@ -147,9 +131,15 @@ public class Schema {
     p.run().waitUntilFinish();
   }
   
+  
   public static void main(String[] args) throws IOException {
     SchemaOptions options =
     PipelineOptionsFactory.fromArgs(args).withValidation().as(SchemaOptions.class);
     runPipeline(options);
   }
 }
+
+// Sugestions to compare LoadCurveWithEnumValueBlueprint
+// --> Equals (Criar classe pai  e extender ambas!)
+// --> JUNIT - Passert
+
