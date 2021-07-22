@@ -1,5 +1,8 @@
 package org.accenture;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import org.apache.avro.reflect.Nullable;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.coders.DefaultCoder;
@@ -65,10 +68,7 @@ public class LoadCurveWithEnumValueRemoveClassTou {
   @Nullable public Status valdateNightProd;
   @Nullable public Status validateReadingStatus;
   
-  
-  
   public LoadCurveWithEnumValueRemoveClassTou() {}
-  
   
   public String toString() {
     return( 
@@ -88,22 +88,25 @@ public class LoadCurveWithEnumValueRemoveClassTou {
     this.validateReadingStatus);
   } 
   
+  private boolean compare(Object[] a, Object[] b){
+    boolean result = true;
+    for(int i =0; i< a.length; i++){
+        if(!a[i].toString().equals(b[i].toString())) {
+          result = false;
+          break;
+        }
+    }
+    return result;
+  }
+
   public boolean equals(LoadCurveWithEnumValueBlueprint old) {
     return( 
-    this.consumption == old.consumption && 
-    // NaN == NaN => False;
-    //this.originalConsumption == old.originalConsumption &&
-    this.classTou.equals(old.classTou) && 
-    this.estRule.equals(old.estRule) &&
-    this.statusLoadCurve.equals(old.statusLoadCurve) &&
-    this.checkPast.equals(old.checkPast) &&
-    this.checkFutu.equals(old.checkFutu) &&
-    this.checkDigits.equals(old.checkDigits) &&
-    this.compareSumOfLC.equals(old.compareSumOfLC) &&
-    this.checkStatus.equals(old.checkStatus) &&
-    this.compareConsumptionMax.equals(old.compareConsumptionMax) &&
-    this.compareConsumptionMin.equals(old.compareConsumptionMin) &&
-    this.valdateNightProd.equals(old.valdateNightProd) &&
-    this.validateReadingStatus.equals(old.validateReadingStatus));
+    this.consumption == old.consumption &&
+    compare(this.classTou.values(), old.classTou.values()) &&
+    compare(this.estRule.values(), old.estRule.values()) &&
+    compare(this.statusLoadCurve.values(), old.statusLoadCurve.values()) &&
+    compare(this.substatusLoadCurve.values(), old.substatusLoadCurve.values())
+    ); 
+  
   } 
 }

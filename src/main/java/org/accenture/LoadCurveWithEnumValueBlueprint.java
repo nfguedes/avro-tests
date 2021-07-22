@@ -7,7 +7,7 @@ import org.apache.beam.sdk.coders.DefaultCoder;
 @DefaultCoder(AvroCoder.class)
 public class LoadCurveWithEnumValueBlueprint {
   public enum ClassTou {
-    A_mais_CONSUMO_VAZIO,
+    A_mais_CONSUMO,
     A_mais_CONSUMO_SUPER_VAZIO,
     A_mais_CONSUMO_PONTA,
     A_mais_CONSUMO_CHEIAS,
