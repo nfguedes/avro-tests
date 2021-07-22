@@ -10,9 +10,8 @@ import org.apache.beam.sdk.coders.DefaultCoder;
 import org.apache.beam.sdk.coders.SnappyCoder;
 import org.apache.beam.sdk.util.CoderUtils;
 
-
 @DefaultCoder(AvroCoder.class)
-public class LoadCurveWithEnumValue {
+public class LoadCurveWithEnumValueOld {
   private enum ClassTou {
     A_mais_CONSUMO_VAZIO,
     A_mais_CONSUMO_SUPER_VAZIO,
@@ -56,27 +55,22 @@ public class LoadCurveWithEnumValue {
     editado_com_estimativa
   }
   
-  @Nullable private float consumption;
-  @Nullable private float originalConsumption;
-  @Nullable private ClassTou classTou;
-  @Nullable private EstRule estRule;
-  @Nullable private Status statusLoadCurve;
-  @Nullable private SubStatus substatusLoadCurve;
-  @Nullable private Status checkPast;
-  @Nullable private Status checkFutu;
-  @Nullable private Status checkDigits;
-  @Nullable private Status compareSumOfLC;
-  @Nullable private Status checkStatus;
-  @Nullable private Status compareConsumptionMax;
-  @Nullable private Status compareConsumptionMin;
-  @Nullable private Status valdateNightProd;
-  @Nullable private Status validateReadingStatus;
+  @Nullable public float consumption;
+  @Nullable public float originalConsumption;
+  @Nullable public ClassTou classTou;
+  @Nullable public EstRule estRule;
+  @Nullable public Status statusLoadCurve;
+  @Nullable public SubStatus substatusLoadCurve;
+  @Nullable public Status checkPast;
+  @Nullable public Status checkFutu;
+  @Nullable public Status checkDigits;
+  @Nullable public Status compareSumOfLC;
+  @Nullable public Status checkStatus;
+  @Nullable public Status compareConsumptionMax;
+  @Nullable public Status compareConsumptionMin;
+  @Nullable public Status valdateNightProd;
+  @Nullable public Status validateReadingStatus;
   
   
-  public LoadCurveWithEnumValue() {}
-  
-  // @Override
-  // public boolean equals(LoadCurveWithEnumValueOld arg1) {
-  //   return(this.substatusLoadCurve == arg1.substatusLoadCurve);
-  // } 
+  public LoadCurveWithEnumValueOld() {}
 }

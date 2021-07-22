@@ -21,6 +21,9 @@ import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 
 import com.google.cloud.bigtable.beam.CloudBigtableScanConfiguration;
+
+import java.io.IOException;
+
 import com.google.cloud.bigtable.beam.CloudBigtableIO;
 
 import org.apache.hadoop.hbase.client.Result;
@@ -29,6 +32,14 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.beam.sdk.util.CoderUtils;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.PrefixFilter;
+
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.TableName;
+
+import com.google.cloud.bigtable.hbase.BigtableConfiguration;
+import org.apache.beam.sdk.transforms.Create;
 
 public class Schema {
   /** A SimpleFunction that converts a Word and Count into a printable string. */
@@ -44,26 +55,53 @@ public class Schema {
   extends SimpleFunction<Result, String> {
     @Override
     public String apply(Result input) {
-      return Bytes.toString(input.getRow()) + Bytes.toString(input.value()) + ": " + input.toString();
+      byte[] family =Bytes.toBytes("LC") ;
+      byte [] qualifier = Bytes.toBytes("AC");
+      return Bytes.toString(input.getValue(family,qualifier));
+      
     }
   }
+  
+  public static class ParseByteArrayToString
+  extends SimpleFunction<LoadCurveWithEnumValue, String> {
+    @Override
+    public String apply(LoadCurveWithEnumValue input) {
+      return input.toString();
+    }
+  }
+  
+  
   
   static class Decodify 
   extends DoFn<Result, LoadCurveWithEnumValue> {
     @ProcessElement
     public void processElement(@Element Result element, OutputReceiver<LoadCurveWithEnumValue> receiver) throws CoderException {
-      // Coder<LoadCurveWithEnumValue>
-      // Input: Result element 
-      // Return: type: LoadCurveWithEnumValue 
-      LoadCurveWithEnumValue help = CoderUtils.decodeFromByteArray(AvroCoder.of(LoadCurveWithEnumValue.class), element.getRow()) ;
+      byte[] family =Bytes.toBytes("LC") ;
+      byte [] qualifier = Bytes.toBytes("AC");
+      System.out.println("\n\n\n\n\n\nVALUE:" + Bytes.toString(element.getValue(family,qualifier)));
+      //LoadCurveWithEnumValue help3 =  CoderUtils.decodeFromByteArray(AvroCoder.of(LoadCurveWithEnumValueOld.class), element.getValue(family,qualifier));
+      LoadCurveWithEnumValue help =  CoderUtils.decodeFromByteArray(AvroCoder.of(LoadCurveWithEnumValue.class), element.getValue(family,qualifier));
+      //System.out.println("LoadCurveWithEnumValue:" + help.toString());
+      //help.equals(help2);
+      receiver.output(help);
+    }
+  }
+  static class Encodify 
+  extends DoFn<LoadCurveWithEnumValue, byte[]> {
+    @ProcessElement
+    public void processElement(@Element LoadCurveWithEnumValue element, OutputReceiver<byte[]> receiver) throws CoderException {
+      
+      byte[] help = CoderUtils.encodeToByteArray(AvroCoder.of(LoadCurveWithEnumValue.class), element);
+      
+      //System.out.println("LoadCurveWithEnumValue:" + element.toString());
+      System.out.println( Bytes.toString(help) + "\n\n\n\n\n\n");
       receiver.output( help );
     }
   }
   
   /** Pipeline default */
-  public interface WordCountOptions 
+  public interface SchemaOptions 
   extends PipelineOptions {
-    
     /**
     * By default, this example reads from a public dataset containing the text of King Lear. Set
     * this option to choose a different input file or glob.
@@ -82,35 +120,36 @@ public class Schema {
     void setOutput(String value);
   }
   
-  static void runPipeline(WordCountOptions options) {
+  static void runPipeline(SchemaOptions options) throws IOException {
     Pipeline p = Pipeline.create(options);
     
-    Scan scan = new Scan();
-    scan.setCacheBlocks(false);
-    String s = "008fd25982229fb41a530ee930a5c267#2021-06-16T22:45:00+00:00";
-    byte[] b = Bytes.toBytes(s);
-    scan.setFilter(new PrefixFilter(b));
+    byte[] TABLE_NAME = Bytes.toBytes("myloadcurves_avro_value_enum_null");
+    Connection connection = BigtableConfiguration.connect("ewx-acn", "veeinstance-hdd");
+    Table table = connection.getTable(TableName.valueOf(TABLE_NAME));
+    String rowKey =  "00000001b152a78bb637d4c6aed23081#2020-11-20T05:45:00+00:00";
+    Result getResult  = table.get(new Get(Bytes.toBytes(rowKey)));
     
-    PCollection<LoadCurveWithEnumValue>  bigTableEntries = p.apply("ReadBigTable", 
-    Read.from(CloudBigtableIO.read(
-    new CloudBigtableScanConfiguration.Builder()
-    .withProjectId("ewx-acn")
-    .withInstanceId("veeinstance-hdd")
-    .withTableId("myloadcurves_avro_value_enum_null")
-    .withScan(scan)
-    .build())))
-  
-    .apply("Codify", ParDo.of( new Decodify()));
+    PCollection<Result> bigTableEntries = p.apply(Create.of(getResult));
+    
+    PCollection<LoadCurveWithEnumValue> decodedEntries = bigTableEntries.apply("Decode", ParDo.of( new Decodify()));
+    
+    // Operations ....
+    //.apply("Operations ..." )
+    
+    PCollection<byte[]> encodedEntries =  decodedEntries.apply("Encode", ParDo.of( new Encodify()));
+    
+    
     // print results from table:
-    //.apply("ParseToString" , MapElements.via(new ParseResultToString()));
-    //bigTableEntries.apply("WRITETOFILE", TextIO.write().to(options.getOutput()));
+    //bigTableEntries.apply("ParseToString" , MapElements.via(new ParseResultToString()))
+    //decodedEntries.apply("ParseToString" , MapElements.via(new ParseByteArrayToString()))
+    //.apply("WRITETOFILE", TextIO.write().to(options.getOutput()));
     
     p.run().waitUntilFinish();
   }
   
-  public static void main(String[] args) {
-    WordCountOptions options =
-    PipelineOptionsFactory.fromArgs(args).withValidation().as(WordCountOptions.class);
+  public static void main(String[] args) throws IOException {
+    SchemaOptions options =
+    PipelineOptionsFactory.fromArgs(args).withValidation().as(SchemaOptions.class);
     runPipeline(options);
   }
 }

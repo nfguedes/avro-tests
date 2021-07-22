@@ -1,0 +1,86 @@
+{
+  "type" : "record",
+  "name" : "LoadCurveWithEnumValue",
+  "namespace" : "org.accenture",
+  "fields" : [ {
+    "name" : "consumption",
+    "type" : [ "null", "float" ],
+    "default" : null
+  }, {
+    "name" : "originalConsumption",
+    "type" : [ "null", "float" ],
+    "default" : null
+  }, {
+    "name" : "classTou",
+    "type" : [ "null", {
+      "type" : "enum",
+      "name" : "ClassTou",
+      "namespace" : "org.accenture.LoadCurveWithEnumValue$",
+      "symbols" : [ "A_mais_CONSUMO_VAZIO", "A_mais_CONSUMO_SUPER_VAZIO", "A_mais_CONSUMO_PONTA", "A_mais_CONSUMO_CHEIAS", "A_menos_PRODUCAO_VAZIO", "A_menos_PRODUCAO_SUPER_VAZIO", "A_menos_PRODUCAO_PONTA", "A_menos_PRODUCAO_CHEIAS" ]
+    } ],
+    "default" : null
+  }, {
+    "name" : "estRule",
+    "type" : [ "null", {
+      "type" : "enum",
+      "name" : "EstRule",
+      "namespace" : "org.accenture.LoadCurveWithEnumValue$",
+      "symbols" : [ "No_estimation_rule_was_applied", "estimation_rule_1_power_down_status", "estimation_rule_1_unable_to_be_estimated_due_to_lack_of_history", "estimation_rule_2_one_missing_period", "estimation_rule_2_unable_to_be_estimated_due_to_lack_of_history", "estimation_rule_3_two_to_twelve_missing_periods_known_read", "estimation_rule_3_unable_to_be_estimated_due_to_lack_of_history", "estimation_rule_4_two_to_twelve_missing_periods_unknown_read", "estimation_rule_4_unable_to_be_estimated_due_to_lack_of_history", "estimation_rule_5_more_than_twelve_missing_periods_known_read", "estimation_rule_5_unable_to_be_estimated_due_to_lack_of_history", "estimation_rule_6_more_than_twelve_missing_periods_unknown_read_with_homologous_period", "estimation_rule_6_unable_to_be_estimated_due_to_lack_of_history", "estimation_rule_7_more_than_twelve_missing_periods_unknown_read_without_homologous_period", "estimation_rule_7_unable_to_be_estimated_due_to_lack_of_history" ]
+    } ],
+    "default" : null
+  }, {
+    "name" : "statusLoadCurve",
+    "type" : [ "null", {
+      "type" : "enum",
+      "name" : "Status",
+      "namespace" : "org.accenture.LoadCurveWithEnumValue$",
+      "symbols" : [ "Valido", "Suspeito", "Invalido", "Inativo" ]
+    } ],
+    "default" : null
+  }, {
+    "name" : "substatusLoadCurve",
+    "type" : [ "null", {
+      "type" : "enum",
+      "name" : "SubStatus",
+      "namespace" : "org.accenture.LoadCurveWithEnumValue$",
+      "symbols" : [ "calculado", "estimado", "editado", "editado_com_estimativa" ]
+    } ],
+    "default" : null
+  }, {
+    "name" : "checkPast",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  }, {
+    "name" : "checkFutu",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  }, {
+    "name" : "checkDigits",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  }, {
+    "name" : "compareSumOfLC",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  }, {
+    "name" : "checkStatus",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  }, {
+    "name" : "compareConsumptionMax",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  }, {
+    "name" : "compareConsumptionMin",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  }, {
+    "name" : "valdateNightProd",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  }, {
+    "name" : "validateReadingStatus",
+    "type" : [ "null", "org.accenture.LoadCurveWithEnumValue$.Status" ],
+    "default" : null
+  } ]
+}
